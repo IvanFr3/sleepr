@@ -31,7 +31,7 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     filterQuery: FilterQuery<TDocument>,
     update: UpdateQuery<TDocument>,
   ) {
-    const document = await this.model.findOne(filterQuery, update, {
+    const document = await this.model.findOneAndUpdate(filterQuery, update, {
       lean: true,
       new: true,
     });
