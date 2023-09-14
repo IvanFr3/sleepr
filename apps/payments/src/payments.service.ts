@@ -13,6 +13,8 @@ export class PaymentsService {
   constructor(private readonly configService: ConfigService) {}
 
   async createCharge({ card, amount }: CreateChargeDto) {
+    // Fix Stripe no direct cards error
+
     // const paymentMethod = await this.stripe.paymentMethods.create({
     //   type: 'card',
     //   card,
