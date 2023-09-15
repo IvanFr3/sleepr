@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { CreateChargeDto } from '@app/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { NOTIFICATIONS_SERVICE } from '@app/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
+import { ClientProxy } from '@nestjs/microservices';
+import { PaymentsCreateChargeDto } from '../dto/payments-create-charge.dto';
 
 @Injectable()
 export class PaymentsService {
@@ -10,9 +12,13 @@ export class PaymentsService {
     { apiVersion: '2023-08-16' },
   );
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(NOTIFICATIONS_SERVICE)
+    private readonly notificationsService: ClientProxy,
+  ) {}
 
-  async createCharge({ card, amount }: CreateChargeDto) {
+  async createCharge({ card, amount, email }: PaymentsCreateChargeDto) {
     // Fix Stripe no direct cards error
 
     // const paymentMethod = await this.stripe.paymentMethods.create({
@@ -27,6 +33,8 @@ export class PaymentsService {
       payment_method_types: ['card'],
       currency: 'usd',
     });
+
+    this.notificationsService.emit('notify_email', { email });
 
     return paymentIntent;
   }
